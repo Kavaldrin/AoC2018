@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <numeric>
 #include <thread>
+#include <set>
 
 using std::fstream;
 using std::cout; using std::endl;
@@ -13,17 +13,19 @@ void taskA(const std::vector<int>& vec,int& solution)
 }
 void taskB(const std::vector<int>& vec, int& solution)
 {
-	std::vector<int> frequences; frequences.push_back(0);
+	//std::vector<int> frequences; frequences.push_back(0);
+	std::set<int> frequences; frequences.insert(0);
+	int prevFreq = 0;
 	while (true) {
 		for (auto& f : vec) {
-			int newfreq = frequences.back() + f;
-			for (auto &existingf : frequences) {
-				if (newfreq == existingf) {
-					solution = newfreq;
-					return;
-				}
+			int newFreq = f + prevFreq;
+			auto found = frequences.find(newFreq);
+			if (found != frequences.end()){
+				solution = *found;
+				return;
 			}
-			frequences.push_back(newfreq);
+			frequences.insert(newFreq);
+			prevFreq = newFreq;
 		}
 	}
 }
@@ -32,10 +34,11 @@ void taskB(const std::vector<int>& vec, int& solution)
 int main()
 {
 	fstream file("input.txt", std::ios::in);
-	if (!file.good()){ 
-		 std::cerr << "Cannot open the file\n";
-		 return -1;
+	if (!file.good()) {
+		std::cerr << "Cannot open the file\n";
+		return -1;
 	}
+
 	std::vector<int> data;
 	while (!file.eof()) {
 		int temp;
