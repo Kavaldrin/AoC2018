@@ -32,13 +32,17 @@ void taskB(const std::vector<int>& vec, int& solution)
 int main()
 {
 	fstream file("input.txt", std::ios::in);
-	if (!file.good()) std::runtime_error("Cannot open the file\n");
+	if (!file.good()){ 
+		 std::cerr << "Cannot open the file\n";
+		 return -1;
+	}
 	std::vector<int> data;
 	while (!file.eof()) {
 		int temp;
 		file >> temp;
 		data.push_back(temp);
 	}
+	file.close();
 
 	int solutionA;
 	int solutionB;
