@@ -4,7 +4,9 @@
 #include <unordered_map>
 #include <set>
 #include <regex>
+#include <map>
 #include <array>
+#include <chrono>
 
 //sleep bit = 1
 //awaken bit = 0
@@ -111,9 +113,7 @@ int taskA(const std::set<Guard>& guards)
 	int maxSlept = 0;
 	for (const auto& guard : guards) {
 		int Slept = 0;
-		for (auto& day : guard.m_days) {
-			Slept += day.second.count();
-		}
+		for (auto& day : guard.m_days) Slept += day.second.count();
 
 		if (Slept > maxSlept) {
 			maxSlept = Slept;
@@ -121,7 +121,6 @@ int taskA(const std::set<Guard>& guards)
 		}
 		
 	}
-
 
 	Guard& laziestOne = const_cast<Guard&>(*(guards.find(Guard(id))));
 	std::array<int, 60> minutes; minutes.fill(0);
@@ -131,9 +130,7 @@ int taskA(const std::set<Guard>& guards)
 		}
 	}
 
-	auto laziestMinute = minutes.end() - std::max_element(minutes.begin(), minutes.end());
-	laziestMinute = 60 - laziestMinute;
-
+	auto laziestMinute = std::distance(minutes.begin(), std::max_element(minutes.begin(), minutes.end()));
 	return id * laziestMinute;
 
 }
@@ -153,7 +150,7 @@ int taskB(std::set<Guard>& guards)
 		}
 		int max = *std::max_element(slept.begin(), slept.end());
 		if (max > maxMinutes) {
-			minute = slept.end() - std::max_element(slept.begin(), slept.end()); minute = 60 - minute;
+			minute = std::distance(slept.begin(), std::max_element(slept.begin(), slept.end()));
 			ID = guard.m_id;
 			maxMinutes = max;
 		}
@@ -167,12 +164,15 @@ int taskB(std::set<Guard>& guards)
 
 int main()
 {
+	auto t1 = std::chrono::steady_clock::now();
 	auto data = prepareData("input.txt");
 	auto guards = prepareGuards(data);
 	auto solutionA = taskA(guards);
 	auto solutionB = taskB(guards);
-	cout << solutionA << endl;
-	cout << solutionB << endl;
+	auto t2 = std::chrono::steady_clock::now();
+	cout << "A: "<< solutionA << endl;
+	cout << "B: "<< solutionB << endl;
+	cout << "Solved in: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms\n";
 
 	system("pause");
 }
