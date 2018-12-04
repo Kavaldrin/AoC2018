@@ -65,41 +65,24 @@ auto prepareGuards(const std::set<std::string>& data)
 
 			keyGuard.m_id = std::stoi(toDo.str().substr(7,std::string::npos));
 		}
-		else if (std::regex_search(line, toDo, wakePattern)) {
+		else {
+			bool toSet = false;
 			auto foundGuard = guards.find(keyGuard);
-
+			if(std::regex_search(line, toDo, sleepPattern)) toSet = true;
 			if (foundGuard == guards.end()) {
 				Guard toInsert(keyGuard.m_id);
 				auto& bitset = toInsert.m_days[date];
 				int start = std::stoi(time.substr(3));
-				for (start; start < 60; ++start) bitset[start] = false;
+				for (start; start < 60; ++start) bitset[start] = toSet;
 				guards.insert(std::move(toInsert));
 			}
 			else {
 				Guard& g = const_cast<Guard&>(*foundGuard); // ale kwas
 				auto& bitset = g.m_days[date];
 				int start = std::stoi(time.substr(3));
-				for (start; start < 60; ++start) bitset[start] = false;
+				for (start; start < 60; ++start) bitset[start] = toSet;
 			}
 		}
-		else if (std::regex_search(line, toDo, sleepPattern)) {
-			auto foundGuard = guards.find(keyGuard);
-
-			if (foundGuard == guards.end()) {
-				Guard toInsert(keyGuard.m_id);
-				auto& bitset = toInsert.m_days[date];
-				int start = std::stoi(time.substr(3));
-				for (start; start < 60; ++start) bitset[start] = true;
-				guards.insert(std::move(toInsert));
-			}
-			else {
-				Guard& g = const_cast<Guard&>(*foundGuard); // ale kwas
-				auto& bitset = g.m_days[date];
-				int start = std::stoi(time.substr(3));
-				for (start; start < 60; ++start) bitset[start] = true;
-			}
-		}
-
 	}
 
 	return guards;
