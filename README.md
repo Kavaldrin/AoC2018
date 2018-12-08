@@ -1,1 +1,1 @@
-#aockurde2018
+https://adventofcode.com/
